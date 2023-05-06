@@ -2,11 +2,11 @@ package com.lokesh.poc.user.controller;
 
 
 import com.lokesh.poc.user.dto.UserDto;
-import com.lokesh.poc.user.model.entity.UserEntity;
+import com.lokesh.poc.user.exception.UserNotFoundException;
+import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
 import com.lokesh.poc.user.service.UserService;
-import com.lokesh.poc.user.utils.EntityDtoUtil;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,28 +23,27 @@ public class UserController {
     UserService userService;
 
     @GetMapping(value = "/users")
-    public ResponseEntity<Flux<UserDto>> getAllUsers() {
-        ResponseEntity<Flux<UserDto>> response;
-        Flux<UserDto> usersList;
-        try {
-            usersList = this.userService.findAllUsers();
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
-        response = ResponseEntity.ok(usersList);
-        return response;
+    public Flux<ResponseEntity<UserDto>> getAllUsers() {
+        return this.userService
+                .findAllUsers()
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build())
+                .log();
+    }
+    @GetMapping(value = "/login/{emailId}")
+    public Mono<ResponseEntity<UserDto>> getUserByEmailId(@PathVariable("emailId") String emailId) {
+        return this.userService
+                .findUserByEmailId(emailId)
+                .map(ResponseEntity::ok)
+                .onErrorMap(ex -> new UserNotFoundException(ex.getMessage()))
+                .log();
     }
     @PostMapping(value = "/signup")
-    public ResponseEntity<Mono<UserDto>> addUser(@RequestBody Mono<UserDto> userDto) {
-        ResponseEntity<Mono<UserDto>> response;
-        Mono<UserDto> userDtoMono;
-        try {
-            userDtoMono = this.userService.addNewUser(userDto);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
-//        response = this.userService.addNewUser(userEntity);
-        response = ResponseEntity.ok(userDtoMono);
-        return response;
+    public Mono<ResponseEntity<UserDto>> addUser(@RequestBody Mono<UserDto> userDto) {
+        return this.userService
+                .addNewUser(userDto)
+                .map(ResponseEntity::ok)
+                .onErrorMap(DuplicateKeyException.class, ex -> new UserWithEmailIdAlreadyExistException("user already exist"))
+                .log();
     }
 }

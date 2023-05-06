@@ -9,4 +9,6 @@ public interface UserService {
     Flux<UserDto> findAllUsers();
 
     Mono<UserDto> addNewUser(Mono<UserDto> userDtoMono);
+
+    Mono<UserDto> findUserByEmailId(String emailId);
 }
