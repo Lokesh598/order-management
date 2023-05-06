@@ -1,11 +1,10 @@
 package com.lokesh.poc.bag.model.entity;
 
+
 import lombok.*;
-import org.bouncycastle.asn1.cms.TimeStampAndCRL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -13,11 +12,13 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(value = "bag")
-public class BagEntity {
+@Document(value = "bagproduct")
+public class BagProductEntity {
     @Id
+    private String id;
     private String bagId;
-    private String userId;
-    private Date created;
+    private String itemId;
     private Date lastModified;
+    private int quantity;
+
 }

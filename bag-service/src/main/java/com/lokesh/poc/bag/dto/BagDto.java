@@ -1,21 +1,14 @@
-package com.lokesh.poc.bag.model.entity;
+package com.lokesh.poc.bag.dto;
 
 import lombok.*;
-import org.bouncycastle.asn1.cms.TimeStampAndCRL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Timestamp;
 import java.util.Date;
-
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(value = "bag")
-public class BagEntity {
-    @Id
+public class BagDto {
     private String bagId;
     private String userId;
     private Date created;
