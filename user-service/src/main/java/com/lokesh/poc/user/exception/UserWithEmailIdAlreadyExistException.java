@@ -7,7 +7,7 @@ public class UserWithEmailIdAlreadyExistException extends RuntimeException{
         super( message );
     }
     public static <T> Mono<T> monoResponseUserWithEmailIdAlreadyExistException(String emailId ) {
-        return Mono.error(new UserWithEmailIdAlreadyExistException( new StringBuilder("Product with [")
+        return Mono.error(new UserWithEmailIdAlreadyExistException( new StringBuilder("User with [")
                 .append( emailId )
                 .append("] already exist").toString() ));
     }
