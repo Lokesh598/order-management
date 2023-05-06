@@ -3,6 +3,7 @@ package com.lokesh.poc.user.service.impl;
 import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
+import com.lokesh.poc.user.model.entity.UserEntity;
 import com.lokesh.poc.user.repository.UserRepository;
 import com.lokesh.poc.user.service.UserService;
 import com.lokesh.poc.user.utils.EntityDtoUtil;
@@ -29,6 +30,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+//    public Mono<UserDto> addNewUser(Mono<UserDto> userDtoMono) {
+//        return userDtoMono
+//                .map(EntityDtoUtil::dtoToEntity)
+//                .map(user -> {
+//                    user.setUserId(UUID.randomUUID().toString());
+//                    user.setCreatedDate(LocalDate.now());
+//                    return user;
+//                })
+//                .switchIfEmpty(UserWithEmailIdAlreadyExistException.monoResponseUserWithEmailIdAlreadyExistException(
+//
+//                ))
+//                .flatMap(userRepository::insert)
+//                .map(EntityDtoUtil::entityToDto);
+//    }
     public Mono<UserDto> addNewUser(Mono<UserDto> userDtoMono) {
         return userDtoMono
                 .map(EntityDtoUtil::dtoToEntity)
@@ -37,9 +52,17 @@ public class UserServiceImpl implements UserService {
                     user.setCreatedDate(LocalDate.now());
                     return user;
                 })
-                .flatMap(userRepository::insert)
+                .flatMap(user -> {
+                    return userRepository.findByEmailId(user.getEmailId())
+                            .flatMap(existingUser -> {
+                                return Mono.error(new UserWithEmailIdAlreadyExistException("User with email ID already exists"));
+                            })
+                            .switchIfEmpty(userRepository.insert(user));
+                })
+                .map(user-> (UserEntity)user)
                 .map(EntityDtoUtil::entityToDto);
     }
+
 
     @Override
     public Mono<UserDto> findUserByEmailId(String emailId) {
