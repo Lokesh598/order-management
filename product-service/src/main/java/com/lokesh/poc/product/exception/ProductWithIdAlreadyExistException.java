@@ -1,7 +1,5 @@
-package io.nisum.cloud.products.errors;
+package com.lokesh.poc.product.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 public class ProductWithIdAlreadyExistException extends RuntimeException {
