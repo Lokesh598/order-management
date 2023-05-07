@@ -8,6 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+/**
+ * this is for test the code and to understand the flow.
+ * this not the part of production.
+ */
 @Controller
 @RestController
 @RequestMapping(value = "/api/bag/v1")
