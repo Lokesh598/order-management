@@ -1,4 +1,4 @@
-package com.lokesh.poc.orderservice;
+package com.lokesh.poc.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

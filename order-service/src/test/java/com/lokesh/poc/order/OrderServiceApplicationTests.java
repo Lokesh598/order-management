@@ -1,4 +1,4 @@
-package com.lokesh.poc.orderservice;
+package com.lokesh.poc.order;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

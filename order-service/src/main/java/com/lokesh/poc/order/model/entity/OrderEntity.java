@@ -1,4 +1,4 @@
-package com.lokesh.poc.orderservice.entity;
+package com.lokesh.poc.order.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,13 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "orders")
+@Document(collection = "order")
 @ToString
 public class OrderEntity {
     @Id
-    private String id;
     private String orderId;
-    private String productId;
-    private int qty;
+    private String bagId;
+    private double amount;
     private String status;
 }
