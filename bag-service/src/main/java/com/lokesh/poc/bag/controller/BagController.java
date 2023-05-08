@@ -32,11 +32,11 @@ public class BagController {
                 .log();
     }
 
-    @GetMapping("/getBag/{bagId}")
-    public Mono<ResponseEntity<BagDto>> getBag(@PathVariable("bagId") String bagId) {
-        return this.bagService
-                .getBag(bagId)
-                .map(ResponseEntity::ok)
-                .log();
-    }
+//    @GetMapping("/getBag/{bagId}")
+//    public Mono<ResponseEntity<BagDto>> getBag(@PathVariable("bagId") String bagId) {
+//        return this.bagService
+//                .getBag(bagId)
+//                .map(ResponseEntity::ok)
+//                .log();
+//    }
 }

@@ -8,21 +8,23 @@ import com.lokesh.poc.bag.service.BagService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Controller
 @RestController
-@RequestMapping(value = "/api/bagProduct/v1")
+@RequestMapping(value = "/api/bagItem/v1")
 public class BagItemController {
     @Autowired
     private BagService bagService;
     @Autowired
     private BagItemService bagItemService;
-    @PostMapping(value = "/addProduct")
+    @PostMapping(value = "/addItem")
     public Mono<ResponseEntity<BagItemDto>> addProductToBag(@RequestBody Mono<BagItemDto> bagProductDto) {
         return this.bagItemService
                 .addProductToBag(bagProductDto)
@@ -30,9 +32,32 @@ public class BagItemController {
                 .log();
     }
 
-    @PostMapping(value = "/bags")
+    @GetMapping(value = "/bags/{bagId}", produces = "application/json")
+    public Flux<BagItemDto> getBag(@PathVariable(value = "bagId") String bagId) {
+        log.info("START: BagController :: bagId: {} ", bagId);
+//        Mono<BagItemDto> bagItemDto = Mono.just(
+//                BagItemDto.builder()
+//                        .bagId(bagId)
+//                        .itemId(itemId)
+//                        .build()
+//        );
+//        return this.bagItemService
+//                .retrieveBag(bagItemDto)
+//                .map(ResponseEntity::ok);
+        return bagItemService.getBagByBagId(bagId);
+//        return bagItemService.getBagByBagId(bagId)
+//                .map(dto-> {
+//                    if (null != null) {
+//                        log.info("BagItemController :: getBag(..) method is calling with bagId " , bagId);
+//                    }
+//                    return dto;
+//                })
+//                .map(bagDto -> ResponseEntity.ok().body(bagDto))
+//                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    @PostMapping(value = "/bags", consumes = "application/json")
+    @ResponseStatus(value = HttpStatus.CREATED)
     public Mono<ResponseEntity<BagItemDto>> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
-                                                          @RequestParam(name = "itemId", required = false) String itemId,
                                                           @RequestBody BagItemRequest body) {
 
 //        BagItemDto bagItemDto = null;
@@ -48,13 +73,14 @@ public class BagItemController {
         Mono<BagItemDto> bagItemDto = Mono.just(
                 BagItemDto.builder()
                         .bagId(bagId)
-                        .itemId(itemId)
+                        .itemId(body.getItemId())
                         .qty(body.getQty())
                         .build()
         );
         return this.bagItemService
                 .addItemToBag(bagItemDto)
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .log();
     }
 
     /**
@@ -67,6 +93,6 @@ public class BagItemController {
         return this.bagItemService
                 .removeProductFromBag(bagProductId)
                 .map(ResponseEntity::ok)
-                .log();
+                .log("item deleted");
     }
 }

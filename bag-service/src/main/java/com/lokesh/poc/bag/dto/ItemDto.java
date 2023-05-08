@@ -6,6 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-    private String upId;
+    private String itemId;
     private int qty;
 }

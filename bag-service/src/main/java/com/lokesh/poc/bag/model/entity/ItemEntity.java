@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemEntity {
-    private String upId;
+    private String itemId;
     private int qty;
 }
