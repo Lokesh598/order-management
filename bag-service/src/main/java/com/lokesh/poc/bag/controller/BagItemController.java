@@ -58,7 +58,25 @@ public class BagItemController {
 //                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-
+    /**
+     *
+     * @Result:
+     * {
+     *     "bagId": "645a058b44fd195e1f18ba47",
+     *     "totalItem": 1,
+     *     "bagItem": [
+     *         {
+     *             "itemId": "2f12089",
+     *             "name": "Mac 16 inch Pro",
+     *             "price": 499800.0,
+     *             "qty": 2
+     *         }
+     *     ]
+     * }
+     *
+     * @param bagId
+     * @return
+     */
     @GetMapping(value = "/user-bag/{bagId}")
     public Mono<BagDO> getUserBag(@PathVariable String bagId) {
         return this.bagItemService.getUserBag(bagId);
@@ -98,6 +116,17 @@ public class BagItemController {
                 .addItemToBag(bagItemDto)
                 .map(ResponseEntity::ok)
                 .log();
+    }
+
+    /**
+     * this method for add new item in users existing bag.
+     *
+     * @param bagId
+     */
+    @PutMapping(value = "/update-bag/{bagId}")
+    public Mono<ResponseEntity<BagItemDto>> updateItemsInBag(@PathVariable String bagId,
+                                                             @RequestBody ItemDto itemDto) {
+        return this.bagItemService.updateItemsInBag(bagId, itemDto).map(ResponseEntity::ok).log();
     }
 
     /**

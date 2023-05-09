@@ -1,14 +1,18 @@
 package com.lokesh.poc.bag.service.impl;
 
+import com.lokesh.poc.bag.dataobject.request.BagItemRequest;
 import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.response.BagItemDO;
 import com.lokesh.poc.bag.dto.BagItemDto;
+import com.lokesh.poc.bag.dto.ItemDto;
+import com.lokesh.poc.bag.model.entity.BagItemEntity;
 import com.lokesh.poc.bag.repository.BagItemRepository;
 import com.lokesh.poc.bag.repository.BagRepository;
 import com.lokesh.poc.bag.service.BagItemService;
 import com.lokesh.poc.bag.utils.BagItemEntityDtoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -157,13 +161,25 @@ public class BagItemServiceImpl implements BagItemService {
 //                }
     }
 
-//    @Override
-//    public Mono<BagItemDto> retrieveBag(Mono<BagItemDto> bagItemDto) {
-//        log.info("Retrieve(..) called", String.valueOf(bagItemDto));
-//        return bagItemDto.flatMap(bagDto ->
-//                this.bagItemRepository
-//                        .findBagByBagId(bagDto.getBagId())
-//                        .flatMap(bag -> this.bagItemRepository.findById(bagDto.getId())).flatMap(BagItemEntityDtoUtils::entityToDto)
-//        );
-//    }
+    @Override
+    public Mono<BagItemDto> updateItemsInBag(String bagId, ItemDto bagItem) {
+        Mono<BagItemDto> bagItemDtoMono = this.bagItemRepository
+                .findByBagId(bagId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Bag not found for id: " + bagId)));;
+        bagItemDtoMono.subscribe(System.out::println);
+
+        return bagItemDtoMono.flatMap(bagItemDto -> {
+            List<ItemDto> itemList = bagItemDto.getItemDto();
+            //todo : check item is already in bag if not then add
+            itemList.add(bagItem);
+            bagItemDto.setItemDto(itemList);
+            BagItemEntity bagItemEntity = new BagItemEntity();
+            bagItemEntity.setId(bagItemDto.getId());
+            bagItemEntity.setBagId(bagItemDto.getBagId());
+            bagItemEntity.setItemDto(bagItemDto.getItemDto());
+            bagItemEntity.setLastModified(bagItemDto.getLastModified());
+            return this.bagItemRepository.save(bagItemEntity).map(BagItemEntityDtoUtils::entityToDto);
+//            return this.bagItemRepository.save((BagItemEntity) bagItemDto);
+        });
+    }
 }
