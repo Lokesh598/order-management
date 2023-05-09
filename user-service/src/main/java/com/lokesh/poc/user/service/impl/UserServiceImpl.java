@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
         return userDtoMono
                 .map(EntityDtoUtil::dtoToEntity)
                 .map(user -> {
-                    user.setUserId(UUID.randomUUID().toString());
+                    user.setUserId(UUID.randomUUID().toString().substring(0,7));
                     user.setCreatedDate(LocalDate.now());
                     return user;
                 })
