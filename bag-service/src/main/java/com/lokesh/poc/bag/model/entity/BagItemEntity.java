@@ -20,10 +20,10 @@ public class BagItemEntity {
     private String id;
     private String bagId;
 
-    private String itemId;
-
-    private int qty;
-
+//    private String itemId;
+//
+//    private int qty;
+    private List<ItemDto> itemDto;
     //bag can have multiple items
 //    private List<ItemEntity> item;
     private Date lastModified;

@@ -14,5 +14,5 @@ import java.util.Optional;
 @Repository
 public interface BagItemRepository extends ReactiveMongoRepository<BagItemEntity, String> {
     @Query("{bagId:?0}")
-    Flux<BagItemDto> findByBagId(String bagId);
+    Mono<BagItemDto> findByBagId(String bagId);
 }

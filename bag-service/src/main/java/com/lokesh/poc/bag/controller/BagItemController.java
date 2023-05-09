@@ -1,12 +1,12 @@
 package com.lokesh.poc.bag.controller;
 
+import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.request.BagItemRequest;
-import com.lokesh.poc.bag.dto.BagDto;
 import com.lokesh.poc.bag.dto.BagItemDto;
+import com.lokesh.poc.bag.dto.ItemDto;
 import com.lokesh.poc.bag.service.BagItemService;
 import com.lokesh.poc.bag.service.BagService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 @Slf4j
 @Controller
@@ -33,7 +35,7 @@ public class BagItemController {
     }
 
     @GetMapping(value = "/bags/{bagId}", produces = "application/json")
-    public Flux<BagItemDto> getBag(@PathVariable(value = "bagId") String bagId) {
+    public Mono<BagItemDto> getBag(@PathVariable(value = "bagId") String bagId) {
         log.info("START: BagController :: bagId: {} ", bagId);
 //        Mono<BagItemDto> bagItemDto = Mono.just(
 //                BagItemDto.builder()
@@ -55,6 +57,19 @@ public class BagItemController {
 //                .map(bagDto -> ResponseEntity.ok().body(bagDto))
 //                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+
+    @GetMapping(value = "/user-bag/{bagId}")
+    public Mono<BagDO> getUserBag(@PathVariable String bagId) {
+        return this.bagItemService.getUserBag(bagId);
+    }
+
+    /**
+     *
+     * @param bagId
+     * @param body
+     * @return
+     */
     @PostMapping(value = "/bags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Mono<ResponseEntity<BagItemDto>> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
@@ -73,8 +88,10 @@ public class BagItemController {
         Mono<BagItemDto> bagItemDto = Mono.just(
                 BagItemDto.builder()
                         .bagId(bagId)
-                        .itemId(body.getItemId())
-                        .qty(body.getQty())
+                        .itemDto(Collections.singletonList(ItemDto.builder()
+                                .itemId(body.getItemId())
+                                .qty(body.getQty())
+                                .build()))
                         .build()
         );
         return this.bagItemService
