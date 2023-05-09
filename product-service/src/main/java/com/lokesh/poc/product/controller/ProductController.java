@@ -2,6 +2,7 @@ package com.lokesh.poc.product.controller;
 
 import com.ctc.wstx.dtd.ModelNode;
 import com.lokesh.poc.product.dto.ProductDto;
+import com.lokesh.poc.product.exception.ProductNotFoundException;
 import com.lokesh.poc.product.exception.ProductWithIdAlreadyExistException;
 import com.lokesh.poc.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,13 @@ public class ProductController {
                 .map(ResponseEntity::ok)
                 .onErrorMap(DuplicateKeyException.class, ex -> new ProductWithIdAlreadyExistException( "Product already exist with this Id" ) )
                 .log();
+    }
+    @GetMapping(value = "/product/{itemId}")
+    public Mono<ResponseEntity<ProductDto>> getItem(@PathVariable String itemId) {
+        return this.productService
+                .getItemByItemId(itemId)
+                .map(ResponseEntity::ok)
+                .onErrorMap(ex -> new ProductNotFoundException(ex.getMessage()));
     }
     /**
      * lets print hello world
