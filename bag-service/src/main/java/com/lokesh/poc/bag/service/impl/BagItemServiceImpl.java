@@ -5,6 +5,7 @@ import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.response.BagItemDO;
 import com.lokesh.poc.bag.dto.BagItemDto;
 import com.lokesh.poc.bag.dto.ItemDto;
+import com.lokesh.poc.bag.exception.ClientNotAllowedException;
 import com.lokesh.poc.bag.model.entity.BagItemEntity;
 import com.lokesh.poc.bag.repository.BagItemRepository;
 import com.lokesh.poc.bag.repository.BagRepository;
@@ -121,6 +122,9 @@ public class BagItemServiceImpl implements BagItemService {
 
                     return bagItemDOMono;
                 })
+                .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
+                //item not found exception
+//                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(itemId, ""))
                 .collectList()
                 .map(bagItemDOS -> {
                     int totalItem = bagItemDOS.size();
@@ -161,6 +165,12 @@ public class BagItemServiceImpl implements BagItemService {
 //                }
     }
 
+    /**
+     *
+     * @param bagId
+     * @param bagItem
+     * @return: updated bag
+     */
     @Override
     public Mono<BagItemDto> updateItemsInBag(String bagId, ItemDto bagItem) {
         Mono<BagItemDto> bagItemDtoMono = this.bagItemRepository

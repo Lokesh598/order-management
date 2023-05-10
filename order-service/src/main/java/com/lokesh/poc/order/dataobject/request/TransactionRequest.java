@@ -14,7 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionRequest {
     private String bagId;
-    private OrderDto order;
     private BagItemDto bagItem;
-    private PaymentDto payment;
 }
