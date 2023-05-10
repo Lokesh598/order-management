@@ -59,7 +59,7 @@ public class BagItemController {
     }
 
     /**
-     *
+     *  BagSummary method
      * @Result:
      * {
      *     "bagId": "645a058b44fd195e1f18ba47",
@@ -75,7 +75,7 @@ public class BagItemController {
      * }
      *
      * @param bagId
-     * @return
+     * @return user bag summary
      */
     @GetMapping(value = "/user-bag/{bagId}")
     public Mono<BagDO> getUserBag(@PathVariable String bagId) {

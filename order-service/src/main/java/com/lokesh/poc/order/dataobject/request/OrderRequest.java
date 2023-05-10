@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionRequest {
+public class OrderRequest {
     private String bagId;
     private OrderDto order;
     private BagItemDto bagItem;

@@ -1,25 +1,22 @@
 package com.lokesh.poc.bag.service.impl;
 
-import com.lokesh.poc.bag.dataobject.request.BagItemRequest;
 import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.response.BagItemDO;
 import com.lokesh.poc.bag.dto.BagItemDto;
 import com.lokesh.poc.bag.dto.ItemDto;
 import com.lokesh.poc.bag.exception.ClientNotAllowedException;
 import com.lokesh.poc.bag.model.entity.BagItemEntity;
+import com.lokesh.poc.bag.repository.BagDORepository;
 import com.lokesh.poc.bag.repository.BagItemRepository;
 import com.lokesh.poc.bag.repository.BagRepository;
 import com.lokesh.poc.bag.service.BagItemService;
 import com.lokesh.poc.bag.utils.BagItemEntityDtoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -32,7 +29,8 @@ public class BagItemServiceImpl implements BagItemService {
     BagRepository bagRepository;
     @Autowired
     BagItemRepository bagItemRepository;
-
+    @Autowired
+    BagDORepository bagDORepository;
     @Autowired
     WebClient.Builder webClientBuilder;
     @Override
@@ -96,6 +94,13 @@ public class BagItemServiceImpl implements BagItemService {
         return null;
     }
 
+    /**
+     * Bag summary method
+     *
+     * @param bagId
+     * @return bag summary
+     */
+
     @Override
     public Mono<BagDO> getUserBag(String bagId) {
         Mono<BagItemDto> bagItemDtoMono = this.bagItemRepository.findByBagId(bagId);
@@ -123,14 +128,18 @@ public class BagItemServiceImpl implements BagItemService {
                     return bagItemDOMono;
                 })
                 .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
-                //item not found exception
+                //todo: item not found exception
 //                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(itemId, ""))
                 .collectList()
                 .map(bagItemDOS -> {
                     int totalItem = bagItemDOS.size();
                     List<BagItemDO> bagItemDOList = bagItemDOS;
                     return new BagDO(bagId, totalItem, bagItemDOList);
-                });//Mono<BagDO>
+                })
+                .flatMap(bagDO -> {
+                    bagDO.setId(bagDO.getBagId());
+                    return this.bagDORepository.save(bagDO);
+                });// to save bag summary in collection
 
 
 //                .zipWith(bagItemDtoMono)
