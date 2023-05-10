@@ -1,9 +1,10 @@
 package com.lokesh.poc.order.service.imp;
 
+import com.lokesh.poc.order.dataobject.BagDO;
 import com.lokesh.poc.order.dataobject.request.TransactionRequest;
+import com.lokesh.poc.order.dataobject.response.CheckoutResponse;
 import com.lokesh.poc.order.dataobject.response.TransactionResponse;
 import com.lokesh.poc.order.dto.BagItemDto;
-import com.lokesh.poc.order.dto.ItemDto;
 import com.lokesh.poc.order.dto.OrderDto;
 import com.lokesh.poc.order.exception.ClientNotAllowedException;
 import com.lokesh.poc.order.exception.ItemNotFoundException;
@@ -26,7 +27,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     WebClient.Builder webClientBuilder;
 
-    private WebClient bagClient = WebClient.create("http://localhost:8084/api/bagItem/v1");
 //    @Override
     public Mono<TransactionResponse> createOrder1(String bagId, TransactionRequest body) {
 
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
                 .baseUrl("http://localhost:8084/api/bagItem/v1")
                 .build()
                 .get()
-                .uri("/bags/{bagId}", bagId)
+                .uri("/user-bag/{bagId}", bagId)
                 .exchangeToFlux(clientResponse -> {
                     if (clientResponse.statusCode().equals(HttpStatus.OK)) {
                         return clientResponse.bodyToFlux(BagItemDto.class);
@@ -137,5 +137,41 @@ public class OrderServiceImpl implements OrderService {
         }).single();
 
         return transactionResponseMono.switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(body.getOrder().getBagId(), ""));
+    }
+
+    @Override
+    public Mono<CheckoutResponse> getCheckoutSummary(String bagId) {
+        return webClientBuilder
+                .baseUrl("http://localhost:8084/api/bagItem/v1")
+                .build()
+                .get()
+                .uri("/user-bag/{bagId}", bagId)
+                .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().equals(HttpStatus.OK)) {
+                        return clientResponse.bodyToMono(BagDO.class);
+                    } else if (clientResponse.statusCode().is4xxClientError()) {
+                        return ClientNotAllowedException.monoResponseClientNotAllowedException();
+                    } else {
+                        return Mono.empty();
+                    }
+                })
+                .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
+                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(bagId, ""))
+//                .flatMapIterable(BagDO::getBagItem)//Mono<BagItemDO>
+//                .map(bagItemDO -> {
+//                    double totalAmountOfBagItems = 0;
+//                    for (int i = 0; i < bagItemDO.getQty(); i++) {
+//                        totalAmountOfBagItems += bagItemDO.getPrice();
+//                    }
+////                    return bagItemDO;
+//                    return new CheckoutResponse(bagId, )
+//                })
+                .map(bagItem -> {
+                    double totalAmountOfBagItems = 0;
+                    for (int i = 0; i < bagItem.getBagItem().size(); i++) {
+                        totalAmountOfBagItems += bagItem.getBagItem().get(i).getPrice();
+                    }
+                    return new CheckoutResponse(bagId, bagItem.getTotalItem(), bagItem.getBagItem(), totalAmountOfBagItems);
+                });
     }
 }

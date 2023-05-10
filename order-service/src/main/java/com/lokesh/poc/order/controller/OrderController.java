@@ -1,12 +1,11 @@
 package com.lokesh.poc.order.controller;
 
-import com.ctc.wstx.dtd.ModelNode;
 import com.lokesh.poc.order.dataobject.request.TransactionRequest;
+import com.lokesh.poc.order.dataobject.response.CheckoutResponse;
 import com.lokesh.poc.order.dataobject.response.TransactionResponse;
 import com.lokesh.poc.order.dto.BagItemDto;
 import com.lokesh.poc.order.dto.UserDto;
 import com.lokesh.poc.order.service.OrderService;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,24 +25,16 @@ public class OrderController {
     @Autowired
     WebClient.Builder webclientBuilder;
 
-    private WebClient bagClient = WebClient.create("http://localhost:8084/api/bagItem/v1");
-    private WebClient userClient = WebClient.create("http://localhost:8082/api/user/v1");
     @GetMapping("/")
     public Mono<String> home() {
         return Mono.just("hello user");
     }
-    @GetMapping("/getbag/{bagId}")
-    public Flux<BagItemDto> getBag(@PathVariable String bagId) {
-                Flux<BagItemDto> bagItemDtoMono = bagClient.get().uri("/bags/{bagId}", bagId).retrieve().bodyToFlux(BagItemDto.class);
-        bagItemDtoMono.subscribe(System.out::println);
-        log.info(String.valueOf(bagItemDtoMono));
-        return bagItemDtoMono;
-    }
-    @GetMapping("/getUser/{userId}")
-    public Mono<UserDto> getUser(@PathVariable String userId) {
-        Mono<UserDto> userDtoMono = userClient.get().uri("/login/{userId}", userId).retrieve().bodyToMono(UserDto.class);
-        userDtoMono.subscribe(System.out::println);
-        return userDtoMono;
+
+
+    @GetMapping(value = "/checkout-summary/{bagId}")
+    public Mono<CheckoutResponse> checkoutSummary(@PathVariable String bagId) {
+        log.info("START: OrderController :: checkoutSummary :: bagId: {}", bagId);
+        return this.orderService.getCheckoutSummary(bagId);
     }
     @PostMapping(value = "/order/{bagId}")
     public Mono<TransactionResponse> doOrder(@PathVariable("bagId") String bagId, @RequestBody TransactionRequest body) {

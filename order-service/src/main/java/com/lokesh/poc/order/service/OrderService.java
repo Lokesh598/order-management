@@ -1,9 +1,12 @@
 package com.lokesh.poc.order.service;
 
 import com.lokesh.poc.order.dataobject.request.TransactionRequest;
+import com.lokesh.poc.order.dataobject.response.CheckoutResponse;
 import com.lokesh.poc.order.dataobject.response.TransactionResponse;
 import reactor.core.publisher.Mono;
 
 public interface OrderService {
-    Mono<TransactionResponse> createOrder(String bagId ,TransactionRequest body);
+    Mono<TransactionResponse> createOrder(String bagId , TransactionRequest body);
+
+    Mono<CheckoutResponse> getCheckoutSummary(String bagId);
 }
