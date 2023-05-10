@@ -13,9 +13,4 @@ public class BagDO {
     private String bagId;
     private int totalItem;
     private List<BagItemDO> bagItem;
-
-    public BagDO(String bagId, List<BagItemDO> bagItemDOList) {
-        this.bagId = bagId;
-        this.bagItem = bagItemDOList;
-    }
 }

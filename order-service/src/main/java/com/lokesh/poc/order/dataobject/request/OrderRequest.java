@@ -13,8 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest {
-    private String bagId;
-    private OrderDto order;
-    private BagItemDto bagItem;
-    private PaymentDto payment;
+    private PaymentDto paymentDto;
 }

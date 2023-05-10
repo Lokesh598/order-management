@@ -13,7 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 public class OrderEntity {
     @Id
+    private String id;
     private String orderId;
-    private String bagId;
+    private String userId;
+    private String transactionId;
+    private String trackingId;
     private String status;
 }
