@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PaymentDto {
     private String id;
+    //paymentId == id
     private String paymentId;
     private String userId;
     private String paymentStatus;

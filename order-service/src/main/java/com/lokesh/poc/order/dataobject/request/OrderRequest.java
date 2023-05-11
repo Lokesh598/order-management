@@ -13,5 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest {
-    private PaymentDto paymentDto;
+//    private PaymentDto paymentDto;
+    private String id;
+    private String paymentId;
+    private String userId;
+    private String paymentStatus;
+    private double amount;
 }

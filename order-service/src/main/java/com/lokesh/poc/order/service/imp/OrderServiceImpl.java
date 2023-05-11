@@ -23,6 +23,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -33,74 +35,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     WebClient.Builder webClientBuilder;
 
-//    @Override
-//    public Mono<OrderResponse> createOrder1(String bagId, OrderRequest body) {
-//
-//        Mono<OrderRequest> requestMono = webClientBuilder
-//                .baseUrl("http://localhost:8084/api/bagItem/v1")
-//                .build()
-//                .get()
-//                .uri("/bags/{bagId}", bagId)
-//                .exchangeToMono( clientResponse -> {
-//                    if( clientResponse.statusCode().equals(HttpStatus.OK) ) {
-//                        System.out.println(clientResponse.bodyToMono(BagItemDto.class));
-//                        return clientResponse.bodyToMono(BagItemDto.class);
-//                    } else if (clientResponse.statusCode().is4xxClientError()) {
-//                        return ClientNotAllowedException.monoResponseClientNotAllowedException();
-//                    } else {
-//                        return Mono.empty();
-//                    }
-//                })
-//                .onErrorMap( ex -> new ClientNotAllowedException("Communcation to client failed"))
-//                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(body.getOrder().getBagId(), ""))
-//                .map(i-> {
-//                    body.getPayment().setOrderId(body.getOrder().getOrderId());
-////                    body.getPayment().setAmount(body.getBagItem().getQty()* i.getPrice());
-//                    return body;
-//                });
-//                requestMono.subscribe(System.out::println);
-//        return null;
-//    }
-
-//    @Override
-//    public Mono<OrderResponse> createOrder2(String bagId, OrderRequest body) {
-
-//        Mono<BagItemDto> bagItemDtoMono = bagClient.get().uri("/bags/{bagId}", bagId).retrieve().bodyToMono(BagItemDto.class);
-//        bagItemDtoMono.subscribe(System.out::println);
-//        log.info(String.valueOf(bagItemDtoMono));
-//        return webClientBuilder
-//                .baseUrl("http://localhost:8084/api/bagItem/v1")
-//                .build()
-//                .get()
-//                .uri("/bags/{bagId}", bagId)
-//                .exchangeToMono(clientResponse -> {
-//                    if (clientResponse.statusCode().equals(HttpStatus.OK)) {
-//                        return clientResponse.bodyToMono(BagItemDto.class);
-//                    } else if (clientResponse.statusCode().is4xxClientError()) {
-//                        return ClientNotAllowedException.monoResponseClientNotAllowedException();
-//                    } else {
-//                        return Mono.empty();
-//                    }
-//                })
-//                .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
-//                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(body.getOrder().getBagId(), ""))
-//                .flatMap(bagItemDto -> {
-//                    body.getPayment().setOrderId(body.getOrder().getOrderId());
-////                    body.getPayment().setAmount(body.getBagItem().getQty() * bagItemDto.getPrice());
-//                    OrderDto orderDto = new OrderDto();
-//                    orderDto.setBagId(bagId);
-//                    orderDto.setStatus("created");
-//                    OrderResponse response = new OrderResponse();
-//                    response.setOrderDto(orderDto);
-//                    response.setAmount(body.getPayment().getAmount());
-//                    response.setTransactionId(body.getPayment().getTransactionId());
-//                    response.setMessage("Order created successfully");
-//                    return Mono.just(response);
-//                });
-//    }
-
     @Override
-    public Mono<OrderResponse> createOrder(String bagId, OrderRequest body) {
+    public Mono<OrderResponse> createOrder(String bagId, OrderRequest request) {
         return webClientBuilder
                 .baseUrl("http://localhost:8084/api/bagItem/v1")
                 .build()
@@ -131,31 +67,36 @@ public class OrderServiceImpl implements OrderService {
                     PaymentDto paymentDto = new PaymentDto();
                     OrderDto orderDto = new OrderDto();
 
-                    orderDto.setOrderId(orderDto.getOrderId());
+                    //paymentID
+                    String paymentId = UUID.randomUUID().toString().substring(0,8);
+                    paymentDto.setPaymentId(paymentId);
+                    paymentDto.setUserId(request.getUserId());
+                    paymentDto.setAmount(request.getAmount());
+
+                    orderDto.setOrderId(orderDto.getId());
                     orderDto.setUserId(null);
-                    orderDto.setTransactionId(body.getPaymentDto().getId());
+                    orderDto.setTransactionId(paymentDto.getPaymentId());
                     orderDto.setTrackingId(bagId);
 
-                    paymentDto.setAmount(body.getPaymentDto().getAmount());
-                    double amountToBePaid = body.getPaymentDto().getAmount();
+                    double amountToBePaid = request.getAmount();
                     boolean status = false;
                     String message = null;
                     double paid = totalAmountOfBagItems - amountToBePaid;
                     if(paid == 0.0) {
                         status = true;
                         message = "Thank you for shop from us🤩🤩🤩";
-                        body.getPaymentDto().setPaymentStatus("Success");
+                        paymentDto.setPaymentStatus("Success");
                         orderDto.setStatus("Success");
                     } else {
                         message = "Payment Fail";
-                        body.getPaymentDto().setPaymentStatus("Fail");
+                        paymentDto.setPaymentStatus("Fail");
                         orderDto.setStatus("Fail, Try again");
                     }
 
 
-                    body.getPaymentDto().setPaymentId(bagItem.getBagId());
+//                    body.getPaymentDto().setPaymentId(bagItem.getBagId());
                     PaymentEntity paymentEntity = new PaymentEntity();
-                    paymentEntity.setId(paymentDto.getId());
+//                    paymentEntity.setId(paymentDto.getId());
                     paymentEntity.setPaymentId(paymentDto.getPaymentId());
                     paymentEntity.setUserId(paymentDto.getUserId());
                     paymentEntity.setPaymentStatus(paymentDto.getPaymentStatus());
@@ -163,35 +104,18 @@ public class OrderServiceImpl implements OrderService {
 
                     //save order and payment in payment entity
                     OrderEntity orderEntity = new OrderEntity();
-                    orderEntity.setOrderId(orderDto.getOrderId());
+                    orderEntity.setOrderId(orderDto.getId());
                     orderEntity.setUserId(orderDto.getUserId());
                     orderEntity.setTransactionId(orderDto.getTransactionId());
                     orderEntity.setTrackingId(orderDto.getTrackingId());
                     orderEntity.setStatus(orderDto.getStatus());
 
-                    this.orderRepository.save(orderEntity).subscribe();
-                    this.paymentRepository.save(paymentEntity).subscribe();
+                    if (status) {
+                        this.orderRepository.save(orderEntity).subscribe();
+                        this.paymentRepository.save(paymentEntity).subscribe();
+                    }
                     return new OrderResponse(amountToBePaid, status, message, bagId);
                 });
-
-//        Mono<OrderResponse> transactionResponseMono = requestFlux.map(bagItemDto -> {
-////            body.getPayment().setOrderId(body.getOrder().getOrderId());
-////            body.getPayment().setAmount(body.getBagItem().getQty() * bagItemDto.getPrice());
-//
-//            OrderDto orderDto = new OrderDto();
-//            orderDto.setBagId(bagId);
-//            orderDto.setStatus("created");
-//
-//            OrderResponse response = new OrderResponse();
-//            response.setOrderDto(orderDto);
-//            response.setAmount(body.getPayment().getAmount());
-//            response.setTransactionId(body.getPayment().getTransactionId());
-//            response.setMessage("Order created successfully");
-//
-//            return response;
-//        }).single();
-//
-//        return transactionResponseMono.switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(bagId, ""));
     }
 
     @Override
