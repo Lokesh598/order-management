@@ -11,4 +11,6 @@ import reactor.core.publisher.Flux;
 public interface OrderRepository extends ReactiveMongoRepository<OrderEntity, String> {
     @Query("{userId:?0}")
     Flux<OrderDto> findAllById(String userId);
+
+    Flux<OrderEntity> findByUserId(String userId);
 }

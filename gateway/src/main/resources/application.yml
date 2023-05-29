@@ -10,7 +10,7 @@ spring:
         - id: product-service
           uri: lb://product-service
           predicates:
-            - Path: /product-service/**
+            - Path=/product-service/**
           filters:
             - StripPrefix=1
         - id: user-service
@@ -40,13 +40,19 @@ info:
   app:
     name: ${spring.application.name}
 
+#eureka:
+#  client:
+#    registerWithEureka: true
+#    serviceUrl:
+#      defaultZone: ${EUREKA_SERVER:http://localhost:8171/eureka}
+#    healthcheck:
+#      enabled: true
 eureka:
   client:
-    registerWithEureka: true
+    register-with-eureka: true
+    fetch-registry: true
     serviceUrl:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8171/eureka}
-    healthcheck:
-      enabled: true
+      defaultZone: http://localhost:8171/eureka
 
 management:
   endpoints:
