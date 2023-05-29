@@ -5,6 +5,7 @@ import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
 import com.lokesh.poc.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class UserController {
                 .log();
     }
     @PostMapping(value = "/signup")
-    public Mono<ResponseEntity<UserDto>> addUser(@RequestBody Mono<UserDto> userDto) {
+    public Mono<ResponseEntity<UserDto>> addUser(@Valid @RequestBody Mono<UserDto> userDto) {
         return this.userService
                 .addNewUser(userDto)
                 .map(ResponseEntity::ok)

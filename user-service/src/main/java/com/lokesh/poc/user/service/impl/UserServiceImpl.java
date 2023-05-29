@@ -7,6 +7,7 @@ import com.lokesh.poc.user.model.entity.UserEntity;
 import com.lokesh.poc.user.repository.UserRepository;
 import com.lokesh.poc.user.service.UserService;
 import com.lokesh.poc.user.utils.EntityDtoUtil;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
 //                .flatMap(userRepository::insert)
 //                .map(EntityDtoUtil::entityToDto);
 //    }
+    @AssertTrue
     public Mono<UserDto> addNewUser(Mono<UserDto> userDtoMono) {
         return userDtoMono
                 .map(EntityDtoUtil::dtoToEntity)
