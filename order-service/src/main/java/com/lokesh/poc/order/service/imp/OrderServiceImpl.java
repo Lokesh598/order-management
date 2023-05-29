@@ -7,6 +7,7 @@ import com.lokesh.poc.order.dataobject.response.OrderResponse;
 import com.lokesh.poc.order.dto.BagItemDto;
 import com.lokesh.poc.order.dto.OrderDto;
 import com.lokesh.poc.order.dto.PaymentDto;
+import com.lokesh.poc.order.dto.UserDto;
 import com.lokesh.poc.order.exception.ClientNotAllowedException;
 import com.lokesh.poc.order.exception.ItemNotFoundException;
 import com.lokesh.poc.order.model.entity.OrderEntity;
@@ -23,7 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Slf4j
 @Service
@@ -35,8 +38,29 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     WebClient.Builder webClientBuilder;
 
+    public String getUserInfo() {
+        return userInfo;
+    }
+
+    private String userInfo;
+
     @Override
-    public Mono<OrderResponse> createOrder(String bagId, OrderRequest request) {
+    public Mono<OrderResponse> createOrder(String bagId, String emailId, OrderRequest request) {
+
+        Mono<UserDto> userDtoMono = webClientBuilder
+                .baseUrl("http://localhost:8082/api/user/v1/")
+                .build()
+                .get()
+                .uri("/login/{emailId}", emailId)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                        .map(userDto -> {
+                            setUserInfo(userDto.getUserId());
+                            System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj  "+userDto.getUserId());
+                            return userDto;
+                        });
+                userDtoMono.subscribe();
+
         return webClientBuilder
                 .baseUrl("http://localhost:8084/api/bagItem/v1")
                 .build()
@@ -52,6 +76,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 })
                 .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
+                //todo: item not found exception give item id instead of bagId
                 .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(bagId, ""))
                 .map(bagItem -> {
                     double totalAmountOfBagItems = 0;
@@ -73,8 +98,9 @@ public class OrderServiceImpl implements OrderService {
                     paymentDto.setUserId(request.getUserId());
                     paymentDto.setAmount(request.getAmount());
 
-                    orderDto.setOrderId(orderDto.getId());
-                    orderDto.setUserId(null);
+                    String orderId = UUID.randomUUID().toString().substring(0,8);
+                    orderDto.setOrderId(orderId);
+                    orderDto.setUserId(getUserInfo());
                     orderDto.setTransactionId(paymentDto.getPaymentId());
                     orderDto.setTrackingId(bagId);
 
@@ -104,7 +130,7 @@ public class OrderServiceImpl implements OrderService {
 
                     //save order and payment in payment entity
                     OrderEntity orderEntity = new OrderEntity();
-                    orderEntity.setOrderId(orderDto.getId());
+                    orderEntity.setOrderId(orderDto.getOrderId());
                     orderEntity.setUserId(orderDto.getUserId());
                     orderEntity.setTransactionId(orderDto.getTransactionId());
                     orderEntity.setTrackingId(orderDto.getTrackingId());
@@ -116,6 +142,10 @@ public class OrderServiceImpl implements OrderService {
                     }
                     return new OrderResponse(amountToBePaid, status, message, bagId);
                 });
+    }
+
+    private void setUserInfo(String userId) {
+        this.userInfo = userId;
     }
 
     @Override
@@ -152,5 +182,24 @@ public class OrderServiceImpl implements OrderService {
                     }
                     return new CheckoutResponse(bagId, bagItem.getTotalItem(), bagItem.getBagItem(), totalAmountOfBagItems);
                 });
+    }
+
+    @Override
+    public Flux<OrderDto> getOrderSummary(String emailId) {
+        Mono<UserDto> userDtoMono = webClientBuilder
+                .baseUrl("http://localhost:8082/api/user/v1/")
+                .build()
+                .get()
+                .uri("/login/{emailId}", emailId)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .map(userDto -> {
+                    setUserInfo(userDto.getUserId());
+                    System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj  "+userDto.getUserId());
+                    return userDto;
+                });
+        userDtoMono.subscribe();
+
+        return this.orderRepository.findAllById(getUserInfo());
     }
 }
