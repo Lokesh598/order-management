@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,6 @@ import java.util.List;
 public class BagDto {
     private String bagId;
     private String userId;
-    private Date created;
-    private Date lastModified;
+    private LocalDate created;
+    private LocalDate lastModified;
 }

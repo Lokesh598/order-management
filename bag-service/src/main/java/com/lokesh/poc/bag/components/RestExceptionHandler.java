@@ -1,7 +1,7 @@
-package com.lokesh.poc.product.component;
+package com.lokesh.poc.bag.components;
 
-import com.lokesh.poc.product.dto.ErrorResponse;
-import com.lokesh.poc.product.exception.ProductNotFoundException;
+import com.lokesh.poc.bag.dataobject.response.ErrorResponse;
+import com.lokesh.poc.bag.exception.ItemNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
-    @ExceptionHandler(ProductNotFoundException.class)
+    @ExceptionHandler(ItemNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse productNotFoundException(Exception ex ) {
+    public ErrorResponse itemNotFoundException(Exception ex ) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 }

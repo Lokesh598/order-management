@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 public interface BagItemService {
-    Mono<BagItemDto> addProductToBag(Mono<BagItemDto> bagProductDto);
+    Mono<BagItemDto> addProductToBag(Optional<String> userId, Mono<BagItemDto> bagProductDto);
 
     Mono<Void> removeProductFromBag(String bagProductId);
 

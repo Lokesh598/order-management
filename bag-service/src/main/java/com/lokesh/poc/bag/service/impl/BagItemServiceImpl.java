@@ -2,14 +2,17 @@ package com.lokesh.poc.bag.service.impl;
 
 import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.response.BagItemDO;
+import com.lokesh.poc.bag.dto.BagDto;
 import com.lokesh.poc.bag.dto.BagItemDto;
 import com.lokesh.poc.bag.dto.ItemDto;
 import com.lokesh.poc.bag.exception.ClientNotAllowedException;
+import com.lokesh.poc.bag.exception.ItemNotFoundException;
 import com.lokesh.poc.bag.model.entity.BagItemEntity;
 import com.lokesh.poc.bag.repository.BagDORepository;
 import com.lokesh.poc.bag.repository.BagItemRepository;
 import com.lokesh.poc.bag.repository.BagRepository;
 import com.lokesh.poc.bag.service.BagItemService;
+import com.lokesh.poc.bag.utils.BagEntityDtoUtil;
 import com.lokesh.poc.bag.utils.BagItemEntityDtoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Slf4j
@@ -34,11 +40,33 @@ public class BagItemServiceImpl implements BagItemService {
     @Autowired
     WebClient.Builder webClientBuilder;
     @Override
-    public Mono<BagItemDto> addProductToBag(Mono<BagItemDto> bagProductDto) {
+    public Mono<BagItemDto> addProductToBag(Optional<String> userId, Mono<BagItemDto> bagProductDto) {
+
+        //setting values for BagEntity
+//        Mono<BagDto> bagDto;
+//        bagDto.map(BagEntityDtoUtil::dtoToEntity)
+//                .map( bag -> {
+//                            bag.setUserId(bag.getUserId());
+//                            bag.setCreated(new Date());
+//                            bag.setLastModified(new Date());
+//                            return bag;
+//                })
+//                .flatMap(bagRepository::insert)
+//                .map(BagEntityDtoUtil::dtoToEntity);
+
+        BagDto bagDto = new BagDto();
+
+        bagDto.setUserId(bagDto.getUserId());
+        bagDto.setCreated(LocalDate.now());
+        bagDto.setLastModified(LocalDate.now());
+
+        Mono<BagDto> bagDtoMono = Mono.just(bagDto);
+        bagDtoMono.map(BagEntityDtoUtil::dtoToEntity).flatMap(bagRepository::insert);
+
         return bagProductDto
                 .map(BagItemEntityDtoUtils::dtoToEntity)
                 .map(bagItem -> {
-                    bagItem.setLastModified(new Date());
+                    bagItem.setLastModified(LocalDate.now());
                     return bagItem;
                 })
                 .flatMap(bagItemRepository::insert)
@@ -56,25 +84,12 @@ public class BagItemServiceImpl implements BagItemService {
         return bagItemDto
                 .map(BagItemEntityDtoUtils::dtoToEntity)
                 .map(item -> {
-                    item.setLastModified(new Date());
+                    item.setLastModified(LocalDate.now());
 //                    item.setQty(item.getQty());
                     return item;
                 })
                 .flatMap(bagItemRepository::insert)
                 .map(BagItemEntityDtoUtils::entityToDto);
-
-        //this will work for update bag
-//        return this.bagItemRepository
-//                .findById(bagId)
-//                .doOnNext(e->e.setBagId(e.getBagId()))
-//                .doOnNext(e->e.setItemId(e.getItemId()))
-//                .map(bagItem -> {
-//                    bagItem.setLastModified(new Date());
-//                    return bagItem;
-//                })
-//                .flatMap(bagItemRepository::insert)
-//                .map(BagItemEntityDtoUtils::entityToDto)
-//                .log();
     }
 
     @Override
@@ -83,10 +98,6 @@ public class BagItemServiceImpl implements BagItemService {
                 .findByBagId(bagId);
         bagItemDtoMono.subscribe(System.out::println);
         return bagItemDtoMono;
-
-//                .flatMap(bag -> this.bagItemRepository
-//                        .findById(bag.getId())
-//                        .thenReturn(bag));
     }
 
     @Override
@@ -104,11 +115,13 @@ public class BagItemServiceImpl implements BagItemService {
     @Override
     public Mono<BagDO> getUserBag(String bagId) {
         Mono<BagItemDto> bagItemDtoMono = this.bagItemRepository.findByBagId(bagId);
-
+        final String[] itemId = new String[1];
         return bagItemDtoMono
                 .map(BagItemDto::getItemDto) // extract list of ItemDto objects
                 .flatMapIterable(Function.identity()) // flatten list into a Flux of ItemDto objects
                 .flatMap(itemDto -> {
+                    itemId[0] = itemDto.getItemId();
+                    log.info(itemId[0]);
                     // fetch BagItemDO by making a request to the product API
                     Mono<BagItemDO> bagItemDOMono = webClientBuilder
                             .baseUrl("http://localhost:8081/api/product/v1")
@@ -124,12 +137,11 @@ public class BagItemServiceImpl implements BagItemService {
                             });
 
                     bagItemDOMono.subscribe(s-> System.out.println(s));
-
                     return bagItemDOMono;
                 })
                 .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
                 //todo: item not found exception
-//                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException(itemId, ""))
+                .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException( itemId[0] ,""))
                 .collectList()
                 .map(bagItemDOS -> {
                     int totalItem = bagItemDOS.size();
@@ -142,36 +154,6 @@ public class BagItemServiceImpl implements BagItemService {
                 });// to save bag summary in collection
 
 
-//                .zipWith(bagItemDtoMono)
-//                .map(tuple -> {
-//                    // create BagDO object by combining BagItemDto and list of BagItemDO objects
-//                    List<BagItemDO> bagItemDOList = Collections.singletonList((BagItemDO) tuple.getT1());
-//                    BagItemDto bagItemDto = tuple.getT2();
-//                    return new BagDO(bagItemDto.getBagId(), bagItemDOList);
-//                });
-
-
-//        Mono<BagItemDto> bagItemDto = this.bagItemRepository
-//                .findByBagId(bagId);
-//        bagItemDto.subscribe(System.out::println);
-//
-//        Mono<BagDO> bagItemDOList = bagItemDto.flatMapMany(bagItem ->
-//                Flux.fromIterable(bagItem.getItemDto()))
-//                .flatMap(itemDto -> {
-//                    String itemId = itemDto.getItemId();
-//                    Mono<BagItemDO> bagItemDO = webClientBuilder
-//                            .baseUrl("http://localhost:8081/api/product/v1")
-//                            .build()
-//                            .get()
-//                            .uri("/product/{itemId}", itemId)
-//                            .retrieve()
-//                            .bodyToMono(BagItemDO.class);
-//                    return bagItemDO;
-//                }).collectList().map(bagItemDOs -> {
-//                    int totalItem = bagItemDOs.size();
-//                    List<BagItemDO> bagItem = bagItemDOs;
-//                    return new BagDO(bagId, totalItem, bagItem);
-//                }
     }
 
     /**

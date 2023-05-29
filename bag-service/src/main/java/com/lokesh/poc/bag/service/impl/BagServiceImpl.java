@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Service
@@ -19,8 +20,8 @@ public class BagServiceImpl implements BagService {
         return bagDto
                 .map(BagEntityDtoUtil::dtoToEntity)
                 .map(bag -> {
-                    bag.setCreated(new Date());
-                    bag.setLastModified(new Date());
+                    bag.setCreated(LocalDate.now());
+                    bag.setLastModified(LocalDate.now());
                     return bag;
                 })
                 .flatMap(bagRepository::insert)

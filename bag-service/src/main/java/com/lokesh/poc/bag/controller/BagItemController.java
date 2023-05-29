@@ -2,10 +2,13 @@ package com.lokesh.poc.bag.controller;
 
 import com.lokesh.poc.bag.dataobject.response.BagDO;
 import com.lokesh.poc.bag.dataobject.request.BagItemRequest;
+import com.lokesh.poc.bag.dto.BagDto;
 import com.lokesh.poc.bag.dto.BagItemDto;
 import com.lokesh.poc.bag.dto.ItemDto;
+import com.lokesh.poc.bag.repository.BagRepository;
 import com.lokesh.poc.bag.service.BagItemService;
 import com.lokesh.poc.bag.service.BagService;
+import com.lokesh.poc.bag.utils.BagEntityDtoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -24,12 +29,23 @@ import java.util.Collections;
 public class BagItemController {
     @Autowired
     private BagService bagService;
+
+    @Autowired
+    private BagRepository bagRepository;
     @Autowired
     private BagItemService bagItemService;
+
+    /**
+     * @Task create bag while adding item in bag. bagItem table and bag table should create together
+     *
+     * @param bagProductDto
+     * @return bag items
+     */
     @PostMapping(value = "/addItem")
-    public Mono<ResponseEntity<BagItemDto>> addProductToBag(@RequestBody Mono<BagItemDto> bagProductDto) {
+    public Mono<ResponseEntity<BagItemDto>> addProductToBag( @RequestParam Optional<String> userId,
+                                                            @RequestBody Mono<BagItemDto> bagProductDto) {
         return this.bagItemService
-                .addProductToBag(bagProductDto)
+                .addProductToBag(userId, bagProductDto)
                 .map(ResponseEntity::ok)
                 .log();
     }
@@ -82,6 +98,7 @@ public class BagItemController {
         return this.bagItemService.getUserBag(bagId);
     }
 
+
     /**
      *
      * @param bagId
@@ -91,6 +108,7 @@ public class BagItemController {
     @PostMapping(value = "/bags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Mono<ResponseEntity<BagItemDto>> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
+                                                          @RequestParam(name = "userId", required = false) String userId,
                                                           @RequestBody BagItemRequest body) {
 
 //        BagItemDto bagItemDto = null;
@@ -106,12 +124,14 @@ public class BagItemController {
         Mono<BagItemDto> bagItemDto = Mono.just(
                 BagItemDto.builder()
                         .bagId(bagId)
+                        .userId(userId)
                         .itemDto(Collections.singletonList(ItemDto.builder()
                                 .itemId(body.getItemId())
                                 .qty(body.getQty())
                                 .build()))
                         .build()
         );
+        bagItemDto.subscribe(System.out::println);
         return this.bagItemService
                 .addItemToBag(bagItemDto)
                 .map(ResponseEntity::ok)

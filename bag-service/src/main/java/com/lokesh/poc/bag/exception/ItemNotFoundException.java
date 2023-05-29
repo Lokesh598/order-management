@@ -9,9 +9,9 @@ public class ItemNotFoundException extends RuntimeException{
         super( message );
     }
 
-    public static <T> Mono<T> monoResponseProductNotFoundException(String id, String name ) {
+    public static <T> Mono<T> monoResponseItemNotFoundException(String id, String name ) {
         return Mono.error(new ItemNotFoundException(
-                new StringBuilder("😬😬 Product with [")
+                new StringBuilder("😬😬 Item with [")
                         .append(StringUtils.isEmpty(id)     ? "" : id   )
                         .append(StringUtils.isEmpty(name)   ? "" : name )
                         .append("] not found, we will add soon ☺☺").toString() ));
