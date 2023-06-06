@@ -18,6 +18,7 @@ import java.util.UUID;
 @Data
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @JsonRootName(value = "user")
 @JsonPropertyOrder({"id", "userId", "userName", "emailId"})
 @AllArgsConstructor

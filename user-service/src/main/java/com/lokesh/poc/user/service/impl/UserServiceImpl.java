@@ -1,5 +1,6 @@
 package com.lokesh.poc.user.service.impl;
 
+import com.lokesh.poc.user.dataobject.UserNameRequest;
 import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
@@ -7,17 +8,14 @@ import com.lokesh.poc.user.model.entity.UserEntity;
 import com.lokesh.poc.user.repository.UserRepository;
 import com.lokesh.poc.user.service.UserService;
 import com.lokesh.poc.user.utils.EntityDtoUtil;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +25,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     @Override
     public Flux<UserDto> findAllUsers() {
+        log.info("find all users called");
         return this.userRepository.findAll().map(EntityDtoUtil::entityToDto);
     }
 
@@ -45,7 +44,7 @@ public class UserServiceImpl implements UserService {
 //                .flatMap(userRepository::insert)
 //                .map(EntityDtoUtil::entityToDto);
 //    }
-    @AssertTrue
+//    @AssertTrue
     public Mono<UserDto> addNewUser(Mono<UserDto> userDtoMono) {
         return userDtoMono
                 .map(EntityDtoUtil::dtoToEntity)
@@ -73,10 +72,30 @@ public class UserServiceImpl implements UserService {
                 .findByEmailId(emailId)
                 .switchIfEmpty(UserNotFoundException.monoResponseProductNotFoundException(emailId, null))
                 .map(EntityDtoUtil::dtoToEntity)
-                .map( userDto -> {
-                    userRepository.findById(userDto.getId());
-                    log.info(userDto.getUserName());
-                    return userDto;
+                .map( user -> {
+                    userRepository.findById(user.getId());
+                    log.info(user.getUserName());
+                    return user;
                 }).map(EntityDtoUtil::entityToDto);
+    }
+    @Override
+    public Mono<UserDto> updateUserInfo(String emailId, UserNameRequest userName) {
+        return this.userRepository.findByEmailId(emailId)
+                .map(EntityDtoUtil::dtoToEntity)
+                .flatMap(user -> {
+                    user.setUserName(userName.getUserName());
+                    return save(user);
+                }).switchIfEmpty(Mono.empty()).map(EntityDtoUtil::entityToDto);
+    }
+    private Mono<UserEntity> save(UserEntity user) {
+        return this.userRepository.save(user);
+    }
+    @Override
+    public Mono<UserDto> deleteUserInfo(String emailId) {
+        return this.userRepository
+                .findByEmailId(emailId).flatMap(u ->
+                        this.userRepository
+                                .deleteById(u.getId())
+                                .thenReturn(u));
     }
 }

@@ -1,9 +1,11 @@
 package com.lokesh.poc.user.controller;
 
 
+import com.lokesh.poc.user.dataobject.UserNameRequest;
 import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
+import com.lokesh.poc.user.model.entity.UserEntity;
 import com.lokesh.poc.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +17,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 //@Api("user-service")
-@Controller
+//@Controller
 @RestController
-@RequestMapping(value = "api/user/v1")
+@RequestMapping(value = "/api/user/v1")
 public class UserController {
 
     @Autowired
     UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping(value = "/users")
     public Flux<ResponseEntity<UserDto>> getAllUsers() {
@@ -46,5 +52,20 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .onErrorMap(DuplicateKeyException.class, ex -> new UserWithEmailIdAlreadyExistException("user already exist"))
                 .log();
+    }
+    //6/6/2023 todo: update and delete users
+    //6/6/23 todo: done
+    @PutMapping(value = "/update/{emailId}")
+    public Mono<ResponseEntity<UserDto>> updateUser(@PathVariable("emailId") String emailId, @Valid @RequestBody UserNameRequest userName) {
+        return this.userService
+                .updateUserInfo(emailId, userName)
+                .flatMap(user -> Mono.just(ResponseEntity.ok(user)))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
+    @DeleteMapping("/delete/{emailId}")
+    private Mono<ResponseEntity<String>> deleteUser(@PathVariable("emailId") String emailId) {
+        return this.userService.deleteUserInfo(emailId)
+                .flatMap(user -> Mono.just(ResponseEntity.ok("Deleted Successfully")))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 }
