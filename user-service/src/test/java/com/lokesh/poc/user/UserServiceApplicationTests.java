@@ -67,13 +67,12 @@ public class UserServiceApplicationTests {
 	@Test
 	public void updateUserInfoTest() {
 		Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "Lokesh", "lokesh@gmail.com", LocalDate.now()));
-		when(userService.updateUserInfo("lokesh@gmail.com", new UserNameRequest("Krish"))).thenReturn(userDtoMono);
+		when(userService.updateUserInfo("lokesh@gmail.com", new UserNameRequest("harish"))).thenReturn(userDtoMono);
 
 		webTestClient.put().uri("/api/user/v1/update/lokesh@gmail.com")
 				.body(Mono.just(userDtoMono),UserDto.class)
 				.exchange()
-//				.expectStatus().isOk();//200
-				.expectBody();
+				.expectStatus().isOk();
 	}
 	@Test
 	public void deleteUserInfoTest() {

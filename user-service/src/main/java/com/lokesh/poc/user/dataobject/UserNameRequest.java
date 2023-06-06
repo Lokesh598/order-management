@@ -8,10 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserNameRequest {
-    @NotNull
     private String userName;
 }
