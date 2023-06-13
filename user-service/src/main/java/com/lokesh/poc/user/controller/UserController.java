@@ -7,7 +7,7 @@ import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
 import com.lokesh.poc.user.model.entity.UserEntity;
 import com.lokesh.poc.user.service.UserService;
-import jakarta.validation.Valid;
+//import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.validation.Valid;
 
 
 /**

@@ -1,13 +1,9 @@
 package com.lokesh.poc.product.controller;
 
-import com.ctc.wstx.dtd.ModelNode;
+
 import com.lokesh.poc.product.dto.ProductDto;
-import com.lokesh.poc.product.exception.ProductNotFoundException;
-import com.lokesh.poc.product.exception.ProductWithIdAlreadyExistException;
 import com.lokesh.poc.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;

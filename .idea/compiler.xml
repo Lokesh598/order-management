@@ -21,7 +21,7 @@
       <module name="gateway" target="17" />
       <module name="order-service" target="17" />
       <module name="product-service" target="17" />
-      <module name="user-service" target="17" />
+      <module name="user-service" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
