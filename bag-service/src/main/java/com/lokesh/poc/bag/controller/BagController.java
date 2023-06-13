@@ -25,11 +25,9 @@ public class BagController {
      * @return
      */
     @PostMapping(value = "/createBag")
-    public Mono<ResponseEntity<BagDto>> createBag(@RequestBody Mono<BagDto> bagDto) {
+    public Mono<BagDto> createBag(@RequestBody Mono<BagDto> bagDto) {
         return this.bagService
-                .createBag(bagDto)
-                .map(ResponseEntity::ok)
-                .log();
+                .createBag(bagDto);
     }
 
 //    @GetMapping("/getBag/{bagId}")

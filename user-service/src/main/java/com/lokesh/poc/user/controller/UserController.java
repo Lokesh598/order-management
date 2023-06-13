@@ -16,8 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+/**
+ * .onErrorMap() commented because we dont need to handle exception from controller.
+ * @Author: Lokesh Singh
+ */
 //@Api("user-service")
-//@Controller
+@Controller
 @RestController
 @RequestMapping(value = "/api/user/v1")
 public class UserController {
@@ -30,40 +35,42 @@ public class UserController {
     }
 
     @GetMapping(value = "/users")
-    public Flux<ResponseEntity<UserDto>> getAllUsers() {
+    public Flux<UserDto> getAllUsers() {
         return this.userService
-                .findAllUsers()
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build())
-                .log();
+                .findAllUsers();
+//                .map(ResponseEntity::ok)
+//                .defaultIfEmpty(ResponseEntity.notFound().build())
+//                .log();
     }
     @GetMapping(value = "/login/{emailId}")
-    public Mono<ResponseEntity<UserDto>> getUserByEmailId(@PathVariable("emailId") String emailId) {
+    public Mono<UserDto> getUserByEmailId(@PathVariable("emailId") String emailId) {
         return this.userService
-                .findUserByEmailId(emailId)
-                .map(ResponseEntity::ok)
-                .onErrorMap(ex -> new UserNotFoundException(ex.getMessage()))
-                .log();
+                .findUserByEmailId(emailId);
+//                .map(ResponseEntity::ok)
+//                .onErrorMap(ex -> new UserNotFoundException(ex.getMessage()))
+//                .log();
     }
     @PostMapping(value = "/signup")
-    public Mono<ResponseEntity<UserDto>> addUser(@Valid @RequestBody Mono<UserDto> userDto) {
+    public Mono<UserDto> addUser(@Valid @RequestBody Mono<UserDto> userDto) {
         return this.userService
-                .addNewUser(userDto)
-                .map(ResponseEntity::ok)
-                .onErrorMap(DuplicateKeyException.class, ex -> new UserWithEmailIdAlreadyExistException("user already exist"))
-                .log();
+                .addNewUser(userDto);
+//                .map(ResponseEntity::ok)
+//                .onErrorMap(DuplicateKeyException.class, ex -> new UserWithEmailIdAlreadyExistException("user already exist"))
+//                .log();
     }
     //6/6/2023 todo: update and delete users
     //6/6/23 todo: done
     @PutMapping(value = "/update/{emailId}")
-    public Mono<ResponseEntity<UserDto>> updateUser(@PathVariable("emailId") String emailId, @Valid @RequestBody UserNameRequest userName) {
+    public Mono<UserDto> updateUser(@PathVariable("emailId") String emailId, @Valid @RequestBody UserNameRequest userName) {
         return this.userService
-                .updateUserInfo(emailId, userName)
-                .flatMap(user -> Mono.just(ResponseEntity.ok(user)))
-                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+                .updateUserInfo(emailId, userName);
+//                .onErrorMap(ex -> new UserNotFoundException(ex.getMessage()));
+//                .flatMap(user -> Mono.just(ResponseEntity.ok(user)))
+//                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
     @DeleteMapping("/delete/{emailId}")
     private Mono<ResponseEntity<String>> deleteUser(@PathVariable("emailId") String emailId) {
+        //todo: status..handling
         return this.userService.deleteUserInfo(emailId)
                 .flatMap(user -> Mono.just(ResponseEntity.ok("Deleted Successfully")))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));

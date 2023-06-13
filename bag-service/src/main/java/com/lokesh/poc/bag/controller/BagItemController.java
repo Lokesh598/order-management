@@ -42,12 +42,12 @@ public class BagItemController {
      * @return bag items
      */
     @PostMapping(value = "/addItem")
-    public Mono<ResponseEntity<BagItemDto>> addProductToBag( @RequestParam Optional<String> userId,
+    public Mono<BagItemDto> addProductToBag( @RequestParam Optional<String> userId,
                                                             @RequestBody Mono<BagItemDto> bagProductDto) {
         return this.bagItemService
-                .addProductToBag(userId, bagProductDto)
-                .map(ResponseEntity::ok)
-                .log();
+                .addProductToBag(userId, bagProductDto);
+//                .map(ResponseEntity::ok)
+//                .log();
     }
 
     @GetMapping(value = "/bags/{bagId}", produces = "application/json")
@@ -107,7 +107,7 @@ public class BagItemController {
      */
     @PostMapping(value = "/bags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Mono<ResponseEntity<BagItemDto>> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
+    public Mono<BagItemDto> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
                                                           @RequestParam(name = "userId", required = false) String userId,
                                                           @RequestBody BagItemRequest body) {
 
@@ -133,9 +133,9 @@ public class BagItemController {
         );
         bagItemDto.subscribe(System.out::println);
         return this.bagItemService
-                .addItemToBag(bagItemDto)
-                .map(ResponseEntity::ok)
-                .log();
+                .addItemToBag(bagItemDto);
+//                .map(ResponseEntity::ok)
+//                .log();
     }
 
     /**
@@ -144,9 +144,11 @@ public class BagItemController {
      * @param bagId
      */
     @PutMapping(value = "/update-bag/{bagId}")
-    public Mono<ResponseEntity<BagItemDto>> updateItemsInBag(@PathVariable String bagId,
+    public Mono<BagItemDto> updateItemsInBag(@PathVariable String bagId,
                                                              @RequestBody ItemDto itemDto) {
-        return this.bagItemService.updateItemsInBag(bagId, itemDto).map(ResponseEntity::ok).log();
+        return this.bagItemService
+                .updateItemsInBag(bagId, itemDto);
+//                .map(ResponseEntity::ok).log();
     }
 
     /**
@@ -154,11 +156,11 @@ public class BagItemController {
      *
      */
     @DeleteMapping("/removeProduct/{bagProductId}")
-    public Mono<ResponseEntity<Void>> removeProductFromBag(@PathVariable String bagProductId) {
+    public Mono<Void> removeProductFromBag(@PathVariable String bagProductId) {
         log.info("item deleted");
         return this.bagItemService
-                .removeProductFromBag(bagProductId)
-                .map(ResponseEntity::ok)
-                .log("item deleted");
+                .removeProductFromBag(bagProductId);
+//                .map(ResponseEntity::ok)
+//                .log("item deleted");
     }
 }

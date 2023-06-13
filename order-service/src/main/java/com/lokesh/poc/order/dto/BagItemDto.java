@@ -2,6 +2,7 @@ package com.lokesh.poc.order.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -14,5 +15,5 @@ public class BagItemDto {
     private String id;
     private String bagId;
     private List<ItemDto> itemDto;
-    private Date lastModified;
+    private LocalDate lastModified;
 }

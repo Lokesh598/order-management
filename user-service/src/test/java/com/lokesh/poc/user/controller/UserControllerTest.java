@@ -1,5 +1,6 @@
 package com.lokesh.poc.user.controller;
 
+import com.lokesh.poc.user.dataobject.UserNameRequest;
 import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.exception.UserNotFoundException;
 import com.lokesh.poc.user.exception.UserWithEmailIdAlreadyExistException;
@@ -15,7 +16,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -27,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class UserControllerTest {
 
     @Autowired
-    private WebTestClient webClient;
+    private WebTestClient webTestClient;
 
     @MockBean
     private UserService userService;
@@ -44,55 +47,58 @@ public class UserControllerTest {
     void getAllUsers() {
     }
 
-    @Test
-    void shouldGetUserByEmailId() {
-        Mono<UserDto> userDto = Mono.just(UserDto.builder()
-                .id("1")
-                .userId("1")
-                .userName("Lokesh")
-                .emailId("test@gmail.com")
-                .createdDate(LocalDate.now())
-                .build());
-        when(userService.findUserByEmailId("test@gmail.com")).thenReturn(userDto);
+    // we dont want to interact with actual database, so we only mock service layer
+    //@InjectMocks //it will not create actual object
 
-        webClient.get().uri("/api/user/v1/login/test@gmail.com")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(UserDto.class);
-
-    }
 
     @Test
-    public void shouldGetUserFail() {
-        when(userService.findUserByEmailId("test@gmail.com")).thenThrow(new UserNotFoundException("user not found"));
-        webClient.get().uri("/api/user/v1/login/test@gmail.com")
+    public void addUserTest() {
+        Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "amit", "amit@gmail.com", LocalDate.now()));
+
+        when(userService.addNewUser(userDtoMono)).thenReturn(userDtoMono);
+
+        webTestClient.post().uri("/api/user/v1/signup")
+                .body(Mono.just(userDtoMono), UserDto.class)
                 .exchange()
-                .expectStatus()
-                .isNotFound()
+                .expectStatus().isOk()
                 .expectBody();
-//                .jsonPath().isEqualTo();
     }
     @Test
-    void addUser() {
-        UserDto userDto = UserDto.builder()
-                .id("1")
-                .userId("1")
-                .userName("Lokesh")
-                .emailId("test@gmail.com")
-                .createdDate(LocalDate.now())
-                .build();
-        when(userService.addNewUser(Mono.just(userDto))).thenReturn(Mono.just(userDto));
-//        webClient.post().uri("/api/user/v1/signup")
-//                .bodyValue(userDto)
-//                .exchange()
-//                .expectStatus()
-//                .isOk()
-//                .expectBody(UserDto.class);
+    public void getUserByEmailTest() {
+        Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "amit", "amit@gmail.com", LocalDate.now()));
+        when(userService.findUserByEmailId("amit@gmail.com")).thenReturn(userDtoMono);
 
+        Flux<UserDto> responseBody = webTestClient.get().uri("/api/user/v1/login/amit@gmail.com")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(UserDto.class)
+                .getResponseBody();
+
+        StepVerifier.create(responseBody)
+                .expectSubscription()
+                .expectNextMatches(p->p.getEmailId().equals("amit@gmail.com"))
+                .verifyComplete();
     }
 
     @Test
-    void updateUser() {
+    public void updateUserInfoTest() {
+        Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "Lokesh", "lokesh@gmail.com", LocalDate.now()));
+        when(userService.updateUserInfo("lokesh@gmail.com", new UserNameRequest("harish"))).thenReturn(userDtoMono);
+
+        webTestClient.put().uri("/api/user/v1/update/lokesh@gmail.com")
+                .body(Mono.just(userDtoMono),UserDto.class)
+                .exchange()
+                .expectStatus().isOk();
+    }
+    @Test
+    public void deleteUserInfoTest() {
+        Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "Lokesh", "lokesh@gmail.com", LocalDate.now()));
+        when(userService.deleteUserInfo("lokesh@gmail.com")).thenReturn(userDtoMono);
+
+        webTestClient.delete().uri("/api/user/v1/delete/lokesh@gmail.com")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(UserDto.class)
+                .getResponseBody();
     }
 }

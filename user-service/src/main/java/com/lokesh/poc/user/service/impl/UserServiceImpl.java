@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserDto> updateUserInfo(String emailId, UserNameRequest userName) {
         return this.userRepository.findByEmailId(emailId)
+                .switchIfEmpty(UserNotFoundException.monoResponseProductNotFoundException(emailId, null))
                 .map(EntityDtoUtil::dtoToEntity)
                 .flatMap(user -> {
                     user.setUserName(userName.getUserName());

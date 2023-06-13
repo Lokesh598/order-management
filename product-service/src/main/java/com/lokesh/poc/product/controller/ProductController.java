@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
  */
 @Controller
 @RestController
-@RequestMapping(value = "/api/product/v1")
+@RequestMapping("/api/product/v1")
 public class ProductController {
 
     @Autowired
@@ -25,19 +25,19 @@ public class ProductController {
 
 
     @PostMapping(value = "/product")
-    public Mono<ResponseEntity<ProductDto>> saveProduct(@RequestBody Mono<ProductDto> productDtoMono) {
+    public Mono<ProductDto> saveProduct(@RequestBody Mono<ProductDto> productDtoMono) {
         return this.productService
-                .saveProduct(productDtoMono)
-                .map(ResponseEntity::ok)
-                .onErrorMap(DuplicateKeyException.class, ex -> new ProductWithIdAlreadyExistException( "Product already exist with this Id" ) )
-                .log();
+                .saveProduct(productDtoMono);
+                //.map(ResponseEntity::ok)
+//                .onErrorMap(DuplicateKeyException.class, ex -> new ProductWithIdAlreadyExistException( "Product already exist with this Id" ) )
+//                .log();
     }
     @GetMapping(value = "/product/{itemId}")
-    public Mono<ResponseEntity<ProductDto>> getItem(@PathVariable String itemId) {
+    public Mono<ProductDto> getItem(@PathVariable String itemId) {
         return this.productService
-                .getItemByItemId(itemId)
-                .map(ResponseEntity::ok)
-                .onErrorMap(ex -> new ProductNotFoundException(ex.getMessage()));
+                .getItemByItemId(itemId);
+//                .map(ResponseEntity::ok)
+//                .onErrorMap(Exception.class, ex -> new ProductNotFoundException(ex.getMessage()));
     }
     /**
      * lets print hello world

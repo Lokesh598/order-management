@@ -3,11 +3,7 @@ package com.lokesh.poc.user;
 import com.lokesh.poc.user.controller.UserController;
 import com.lokesh.poc.user.dataobject.UserNameRequest;
 import com.lokesh.poc.user.dto.UserDto;
-import com.lokesh.poc.user.repository.UserRepository;
-import com.lokesh.poc.user.service.UserService;
 import com.lokesh.poc.user.service.impl.UserServiceImpl;
-import com.lokesh.poc.user.utils.EntityDtoUtil;
-//import org.junit.jupiter.api.Test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,18 +34,19 @@ public class UserServiceApplicationTests {
 
 	@Test
 	public void addUserTest() {
-		Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "Lokesh", "lokesh@gmail.com", LocalDate.now()));
+		Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "amit", "amit@gmail.com", LocalDate.now()));
 
 		when(userService.addNewUser(userDtoMono)).thenReturn(userDtoMono);
 
 		webTestClient.post().uri("/api/user/v1/signup")
 				.body(Mono.just(userDtoMono), UserDto.class)
 				.exchange()
+				.expectStatus().isOk()
 				.expectBody();
 	}
 	@Test
 	public void getUserByEmailTest() {
-		Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "Lokesh", "lokesh@gmail.com", LocalDate.now()));
+		Mono<UserDto> userDtoMono = Mono.just(new UserDto("1", "1", "amit", "lokesh@gmail.com", LocalDate.now()));
 		when(userService.findUserByEmailId("lokesh@gmail.com")).thenReturn(userDtoMono);
 
 		Flux<UserDto> responseBody = webTestClient.get().uri("/api/user/v1/login/lokesh@gmail.com")

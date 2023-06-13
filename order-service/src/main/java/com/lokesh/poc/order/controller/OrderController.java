@@ -30,8 +30,8 @@ public class OrderController {
     @Autowired
     UserOrderService userOrderService;
 
-    @Autowired
-    WebClient.Builder webclientBuilder;
+//    @Autowired
+//    WebClient.Builder webclientBuilder;
 
     public OrderController(UserOrderService userOrderService) {
         this.userOrderService = userOrderService;
