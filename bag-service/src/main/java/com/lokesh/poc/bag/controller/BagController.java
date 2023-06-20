@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
  * this is for test the code and to understand the flow.
  * this not the part of production.
  */
-@Controller
 @RestController
 @RequestMapping(value = "/api/bag/v1")
 public class BagController {
@@ -29,12 +28,4 @@ public class BagController {
         return this.bagService
                 .createBag(bagDto);
     }
-
-//    @GetMapping("/getBag/{bagId}")
-//    public Mono<ResponseEntity<BagDto>> getBag(@PathVariable("bagId") String bagId) {
-//        return this.bagService
-//                .getBag(bagId)
-//                .map(ResponseEntity::ok)
-//                .log();
-//    }
 }

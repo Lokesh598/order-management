@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BagItemRequest {
-//    BagItemDto itemDto;
     private String itemId;
     private int qty;
 }

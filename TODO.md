@@ -2,6 +2,7 @@
 #### Todos
 
 1. [ ] payment and order collection user id
+2. [ ] payment and order collection date and time 
 2. [ ] after payment success empty user bag
 3. [ ] validate bag for verified user
 4. [ ] add item in bag that time create bag and bag-item table

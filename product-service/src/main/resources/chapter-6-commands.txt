@@ -1,0 +1,34 @@
+
+## Creating the Topic
+
+        ./kafka-topics.sh \
+            --zookeeper zookeeper:2181 \
+            --create \
+            --topic kafka.usecase.students \
+            --partitions 2 \
+            --replication-factor 1
+
+## Describe the Topic
+
+        ./kafka-topics.sh \
+            --zookeeper zookeeper:2181 \
+            --topic kafka.usecase.students \
+            --describe
+
+## Publish to the Topic
+
+        ./kafka-console-producer.sh \
+            --bootstrap-server localhost:29092 \
+            --property "parse.key=true" \
+            --property "key.separator=:" \
+            --topic kafka.usecase.students
+
+## Consume Message from the Topic
+
+        ./kafka-console-consumer.sh \
+            --bootstrap-server localhost:29092 \
+            --topic kafka.usecase.students \
+            --group usecase-consumer-group \
+            --property print.key=true \
+            --property key.separator=" = " \
+            --from-beginning

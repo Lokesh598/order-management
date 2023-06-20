@@ -140,7 +140,7 @@ public class BagItemServiceImpl implements BagItemService {
                     return bagItemDOMono;
                 })
                 .onErrorMap(ex -> new ClientNotAllowedException("Communication to client failed"))
-                //todo: item not found exception
+                // Todo: item not found exception
                 .switchIfEmpty(ItemNotFoundException.monoResponseItemNotFoundException( itemId[0] ,""))
                 .collectList()
                 .map(bagItemDOS -> {
@@ -156,6 +156,15 @@ public class BagItemServiceImpl implements BagItemService {
 
     }
 
+    /**
+     * service consuming kafka topic
+     * @Return: user bag summary
+     */
+
+    Mono<BagDO> getUserBagSummary(String bagId) {
+        Mono<BagItemDto> bagItemDtoMono = this.bagItemRepository.findByBagId(bagId);
+        return null;
+    }
     /**
      *
      * @param bagId

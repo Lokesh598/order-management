@@ -1,0 +1,24 @@
+
+1. Please make sure that Docker is already installed in the system,
+If not, install from https://www.docker.com/products/docker-desktop
+
+2. If on Windows O/S, open a Powershell window.
+If on Mac OS or Linux, open a Terminal window.
+
+3. Navigate to the directory where the exercise files are downloaded.
+This directory would contain the kafka-single-node.yml file
+
+4. Execute the following command from this directory
+
+        docker-compose -f kafka-single-node-product-service.yml up -d
+
+5. Check if the containers are up and running
+
+        docker ps
+
+
+6. To shutdown and remove the setup, execute this command in the same directory
+
+        docker-compose -f kafka-single-node.yml down
+
+

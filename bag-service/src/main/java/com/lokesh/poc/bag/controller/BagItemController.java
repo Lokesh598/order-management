@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j
-@Controller
 @RestController
 @RequestMapping(value = "/api/bagItem/v1")
 public class BagItemController {
@@ -46,32 +45,12 @@ public class BagItemController {
                                                             @RequestBody Mono<BagItemDto> bagProductDto) {
         return this.bagItemService
                 .addProductToBag(userId, bagProductDto);
-//                .map(ResponseEntity::ok)
-//                .log();
     }
 
     @GetMapping(value = "/bags/{bagId}", produces = "application/json")
     public Mono<BagItemDto> getBag(@PathVariable(value = "bagId") String bagId) {
         log.info("START: BagController :: bagId: {} ", bagId);
-//        Mono<BagItemDto> bagItemDto = Mono.just(
-//                BagItemDto.builder()
-//                        .bagId(bagId)
-//                        .itemId(itemId)
-//                        .build()
-//        );
-//        return this.bagItemService
-//                .retrieveBag(bagItemDto)
-//                .map(ResponseEntity::ok);
         return bagItemService.getBagByBagId(bagId);
-//        return bagItemService.getBagByBagId(bagId)
-//                .map(dto-> {
-//                    if (null != null) {
-//                        log.info("BagItemController :: getBag(..) method is calling with bagId " , bagId);
-//                    }
-//                    return dto;
-//                })
-//                .map(bagDto -> ResponseEntity.ok().body(bagDto))
-//                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     /**
@@ -110,17 +89,6 @@ public class BagItemController {
     public Mono<BagItemDto> addItemsToBag(@RequestParam(name = "bagId", required = true ) String bagId,
                                                           @RequestParam(name = "userId", required = false) String userId,
                                                           @RequestBody BagItemRequest body) {
-
-//        BagItemDto bagItemDto = null;
-//        BagDto bagDto = null;
-//        BagRequestDto bagRequestDto = null;
-//        if (StringUtils.isBlank(bagId)) {
-//            bagDto = bagService.addItemsToEmptyBag();
-//        } else {
-//            bagDto = bagService.addItemsToCurrentBag();
-//        }
-//        return
-//        int quantity = body.getItemDto().getQty();
         Mono<BagItemDto> bagItemDto = Mono.just(
                 BagItemDto.builder()
                         .bagId(bagId)
@@ -134,8 +102,6 @@ public class BagItemController {
         bagItemDto.subscribe(System.out::println);
         return this.bagItemService
                 .addItemToBag(bagItemDto);
-//                .map(ResponseEntity::ok)
-//                .log();
     }
 
     /**
@@ -148,7 +114,6 @@ public class BagItemController {
                                                              @RequestBody ItemDto itemDto) {
         return this.bagItemService
                 .updateItemsInBag(bagId, itemDto);
-//                .map(ResponseEntity::ok).log();
     }
 
     /**
@@ -160,7 +125,5 @@ public class BagItemController {
         log.info("item deleted");
         return this.bagItemService
                 .removeProductFromBag(bagProductId);
-//                .map(ResponseEntity::ok)
-//                .log("item deleted");
     }
 }
