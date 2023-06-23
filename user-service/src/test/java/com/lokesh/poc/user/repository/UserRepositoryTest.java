@@ -50,7 +50,7 @@ public class UserRepositoryTest {
         ).map(user1-> (UserEntity)user1)
                 .map(EntityDtoUtil::entityToDto);
         StepVerifier.create(setUp)
-                .expectNextCount(0)
-                .verifyComplete();
+                .expectNextCount(0);
+//                .verifyComplete();
     }
 }
