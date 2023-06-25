@@ -13,6 +13,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +58,7 @@ public class ProductController {
      * @return
      */
     @PostMapping(value = "/product")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<ProductDto> saveItem(@RequestBody Mono<ProductDto> productDtoMono) {
 //        return this.kafkaSender.createOutbound()
 //                .send(productDtoMono.map(productDto -> new ProducerRecord<>(topic, "product.name", productDto)))
@@ -70,6 +72,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/product/{itemId}")
+    @ResponseStatus(HttpStatus.OK)
     public Mono<ProductDto> getItem(@PathVariable String itemId) {
         return this.productService
                 .getItemByItemId(itemId);

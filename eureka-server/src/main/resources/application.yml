@@ -4,8 +4,11 @@ eureka:
     fetch-registry: false
 
 
+#server:
+#  port: 8171
+
 server:
-  port: 8171
+  port: 8761
 
 spring:
   application:

@@ -1,21 +1,21 @@
 server:
   port: 8082
 
-#spring:
-#  application:
-#    name: user-service
+spring:
+  application:
+    name: user-service
 
-#eureka:
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#    serviceUrl:
-#      defaultZone: http://localhost:8171/eureka  #eureka endpoint
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka  #eureka endpoint
 
-#    healthcheck:
-#      enabled: true
-#
-#  instance:
-#    leaseRenewalIntervalInSeconds: 1
-#    leaseExpirationDurationInSeconds: 2
-#    hostname: localhost
+    healthcheck:
+      enabled: true
+
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+    hostname: localhost
