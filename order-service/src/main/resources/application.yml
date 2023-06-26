@@ -4,18 +4,19 @@ server:
 spring:
   application:
     name: order-service
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka  #eureka endpoint
-
-    healthcheck:
-      enabled: true
-
-  instance:
-    leaseRenewalIntervalInSeconds: 1
-    leaseExpirationDurationInSeconds: 2
-    hostname: localhost
+  config:
+    import: configserver:http://localhost:8085
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka  #eureka endpoint
+#
+#    healthcheck:
+#      enabled: true
+#
+#  instance:
+#    leaseRenewalIntervalInSeconds: 1
+#    leaseExpirationDurationInSeconds: 2
+#    hostname: localhost

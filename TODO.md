@@ -9,6 +9,7 @@
 5. [X] call user service while creating bag to bring userid in bag.
 6. [ ] user auth security
 7. [ ] when order created by user? add date of this
+8. [ ] call inventory service, and place order if product is in stock
 
 
 #### todos for products

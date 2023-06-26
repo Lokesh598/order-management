@@ -7,8 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="product-service" />
         <module name="bag-service" />
+        <module name="config-server" />
+        <module name="product-service" />
         <module name="user-service" />
         <module name="order-service" />
         <module name="eureka-server" />
@@ -17,6 +18,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="bag-service" target="17" />
+      <module name="config-server" target="17" />
       <module name="eureka-server" target="17" />
       <module name="gateway" target="17" />
       <module name="order-service" target="17" />
@@ -27,6 +29,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="bag-service" options="-parameters" />
+      <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="order-service" options="-parameters" />
