@@ -1,31 +1,22 @@
 package com.lokesh.poc.product.configuration;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
+
 
 @Configuration
-@EnableSwagger2WebFlux
 public class SwaggerConfig {
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("User Service Documentation")
-                .description("Reactive API Documentation")
-                .version("1.0.0")
-                .build();
-    }
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info().title("Product Service").version("1.0.0"))
+                .components(new Components())
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .addServersItem(new Server().url("http://localhost:8081"));
     }
 }

@@ -2,10 +2,21 @@ server:
   port: 8082
 
 spring:
-  application:
-    name: user-service
   config:
     import: configserver:http://localhost:8085
+
+    # Configure the message broker connection (RabbitMQ or Kafka)
+#  cloud:
+#    config:
+#      uri: http://${CONFIG_SERVER_SERVICE_SERVICE_HOST:localhost}:8085
+#    bus:
+#      enabled: true
+#      refresh:
+#        enabled: true
+#      trace:
+#        enabled: true
+#  rabbitmq:
+#    addresses: ${RABBITMQ_SERVICE_SERVICE_HOST:localhost}
 #eureka:
 #  client:
 #    register-with-eureka: true

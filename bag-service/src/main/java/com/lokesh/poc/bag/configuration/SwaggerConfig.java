@@ -1,4 +1,4 @@
-package com.lokesh.poc.user.configuration;
+package com.lokesh.poc.bag.configuration;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,9 +13,9 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("User Service").version("1.0.0"))
+                .info(new Info().title("Bag Service").version("1.0.0"))
                 .components(new Components())
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .addServersItem(new Server().url("http://localhost:8082"));
+                .addServersItem(new Server().url("http://localhost:8083"));
     }
 }

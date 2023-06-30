@@ -4,6 +4,7 @@ package com.lokesh.poc.user.controller;
 import com.lokesh.poc.user.dataobject.UserNameRequest;
 import com.lokesh.poc.user.dto.UserDto;
 import com.lokesh.poc.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
+
 
 
 /**

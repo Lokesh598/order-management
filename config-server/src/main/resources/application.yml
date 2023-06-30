@@ -1,5 +1,6 @@
 server:
   port: 8085
+
 spring:
   application:
     name: config-server
@@ -9,4 +10,22 @@ spring:
       server:
         git:
           uri: https://github.com/Lokesh598/order-management-spring-cloud-config
+          default-label: main
           clone-on-start: true
+    monitor:
+      enabled: true
+    bus:
+      enabled: true
+#    stream:
+#      kafka:
+#        binder:
+#          brokers: localhost:9092
+#        bindings:
+#          output:
+#            destination: config-server
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"

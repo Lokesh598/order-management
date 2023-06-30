@@ -2,8 +2,6 @@ server:
   port: 8084
 
 spring:
-  application:
-    name: bag-service
   config:
     import: configserver:http://localhost:8085
 #eureka:
