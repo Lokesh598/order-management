@@ -186,6 +186,7 @@ public class BagItemServiceImpl implements BagItemService {
             BagItemEntity bagItemEntity = new BagItemEntity();
             bagItemEntity.setId(bagItemDto.getId());
             bagItemEntity.setBagId(bagItemDto.getBagId());
+            bagItemEntity.setUserId(bagItemDto.getUserId());
             bagItemEntity.setItemDto(bagItemDto.getItemDto());
             bagItemEntity.setLastModified(bagItemDto.getLastModified());
             return this.bagItemRepository.save(bagItemEntity).map(BagItemEntityDtoUtils::entityToDto);

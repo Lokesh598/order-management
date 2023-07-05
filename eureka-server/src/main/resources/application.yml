@@ -3,9 +3,9 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
 
-
+#
 #server:
-#  port: 8171
+#  port: 8761
 
 server:
   port: 0
