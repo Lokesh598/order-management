@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface OrderService {
-    Mono<OrderResponse> createOrder(String bagId, String userId , OrderRequest body);
+    Mono<OrderResponse> createOrder(String bagId, String emailId , OrderRequest body);
 
     Mono<CheckoutResponse> getCheckoutSummary(String bagId);
 

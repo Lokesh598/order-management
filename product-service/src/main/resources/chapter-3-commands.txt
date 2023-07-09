@@ -54,7 +54,7 @@
 
         ./kafka-console-producer.sh \
             --bootstrap-server localhost:29092 \
-            --topic kafka.integrating.product
+            --topic product-topic-2
 
 ## Consuming Messages from Topics
 

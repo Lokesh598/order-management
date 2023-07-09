@@ -50,7 +50,7 @@ public class OrderController {
     }
     @PostMapping(value = "/order/{bagId}")
     public Mono<OrderResponse> doOrder(@PathVariable("bagId") String bagId,
-                                       @RequestParam(value = "userId" , required = false) String emailId,
+                                       @RequestParam(value = "emailId" , required = false) String emailId,
                                        @RequestBody OrderRequest body) {
         log.info("START: BagController :: bagId: {} ", bagId);
         return this.orderService.createOrder(bagId, emailId ,body);
