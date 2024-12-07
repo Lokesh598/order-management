@@ -2,6 +2,8 @@ server:
   port: 8172
 
 spring:
+  profiles:
+    active: local
   application:
     name: api-gateway
   config:
@@ -56,19 +58,19 @@ info:
 #    healthcheck:
 #      enabled: true
 
-#eureka:
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#    serviceUrl:
-#      defaultZone: http://localhost:8761/eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include:
-#          - mappings
-#          - env
-#          - health
-#          - info
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - mappings
+          - env
+          - health
+          - info

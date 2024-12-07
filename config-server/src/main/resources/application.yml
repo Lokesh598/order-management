@@ -2,6 +2,8 @@ server:
   port: 8085
 
 spring:
+  profiles:
+    active: local
   application:
     name: config-server
 
@@ -16,16 +18,16 @@ spring:
       enabled: true
     bus:
       enabled: true
-#    stream:
-#      kafka:
-#        binder:
-#          brokers: localhost:9092
-#        bindings:
-#          output:
-#            destination: config-server
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        bindings:
+          output:
+            destination: config-server
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

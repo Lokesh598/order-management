@@ -1,15 +1,36 @@
 server:
-  port: 8082
+  port: 8085
 
 spring:
-  profiles:
-    active: local
   application:
-    name: user-service
-#  config:
-#    import: configserver:http://localhost:8085
-#    config:
-#      enabled: true
+    name: config-service
+  config:
+    activate:
+      on-profile: local
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Lokesh598/order-management-spring-cloud-config
+          default-label: main
+          clone-on-start: true
+    monitor:
+      enabled: true
+    bus:
+      enabled: false
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        bindings:
+          output:
+            destination: config-server
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "*"
 
     # Configure the message broker connection (RabbitMQ or Kafka)
 #  cloud:
