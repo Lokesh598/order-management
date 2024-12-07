@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java CI with Maven (Order-management)
 
 on:
   push:
@@ -23,13 +23,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Step 3: Debug - List directory contents
+      # Step 3: Debug - List directory contents (Optional)
       - name: List directory contents
         run: ls -R
 
-      # Step 4: Build the Maven project in the user-service directory
-      - name: Build user-service with Maven
-        run: mvn -B package --file user-service/pom.xml
+      # Step 4: Build the Maven project starting from the parent POM
+      - name: Build Order-management Maven project
+        run: mvn -B clean install
 
       # Optional: Update dependency graph for Dependabot
       - name: Update dependency graph
