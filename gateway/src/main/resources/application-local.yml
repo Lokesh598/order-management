@@ -1,0 +1,82 @@
+server:
+  port: 8172
+
+spring:
+  application:
+    name: gateway-service
+  config:
+    activate:
+      on-profile: local
+    import: "optional:configserver:"
+    config:
+      enabled: true
+      import: configserver:http://localhost:8085
+      cloud:
+        gateway:
+          routes:
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/product-service/**
+              filters:
+                - StripPrefix=1
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/user-service/**
+              filters:
+                - StripPrefix=1
+            - id: bag-service
+              uri: lb://bag-service
+              predicates:
+                - Path=/bag-service/**
+              filters:
+                - StripPrefix=1
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/order-service/**
+              filters:
+                - StripPrefix=1
+            - id: registry
+              uri: lb://registry
+              predicates:
+                - Path=/registry/**
+              filters:
+                - StripPrefix=1
+            - id: eureka
+              uri: lb://registry
+              predicates:
+                - Path=/eureka/**
+
+    info:
+      app:
+        name: ${spring.application.name}
+  cloud:
+    bus:
+      enabled: false
+
+    # Configure the message broker connection (RabbitMQ or Kafka)
+#  cloud:
+#    config:
+#      uri: http://${CONFIG_SERVER_SERVICE_SERVICE_HOST:localhost}:8085
+#    bus:
+#      enabled: true
+#      refresh:
+#        enabled: true
+#      trace:
+#        enabled: true
+#  rabbitmq:
+#    addresses: ${RABBITMQ_SERVICE_SERVICE_HOST:localhost}
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}  #eureka endpoint
+    healthcheck:
+      enabled: true
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+    hostname: localhost

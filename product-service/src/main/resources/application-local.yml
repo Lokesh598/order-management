@@ -1,15 +1,18 @@
 server:
-  port: 8082
+  port: 8081
 
 spring:
-  profiles:
-    active: local
   application:
-    name: user-service
-#  config:
-#    import: configserver:http://localhost:8085
+    name: product-service
+  config:
+    activate:
+      on-profile: local
+    import: "optional:configserver:"
 #    config:
 #      enabled: true
+  cloud:
+    bus:
+      enabled: false
 
     # Configure the message broker connection (RabbitMQ or Kafka)
 #  cloud:

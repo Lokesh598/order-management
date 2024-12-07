@@ -3,13 +3,16 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
 
-#
-#server:
-#  port: 8761
 
 server:
-  port: 8767
+  port: 8761
+
+
+#server:
+#  port: 8767
 
 spring:
+  profiles:
+    active: local
   application:
     name: registry

@@ -1,0 +1,36 @@
+name: Java CI with Maven (Order-management)
+
+on:
+  push:
+    branches: [ "action_build" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - uses: actions/checkout@v4
+
+      # Step 2: Set up JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # Step 3: Debug - List directory contents (Optional)
+      - name: List directory contents
+        run: ls -R
+
+      # Step 4: Build the Maven project starting from the parent POM
+      - name: Build Order-management Maven project
+        run: mvn -B clean install
+
+      # Optional: Update dependency graph for Dependabot
+      - name: Update dependency graph
+        uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
